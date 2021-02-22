@@ -12,11 +12,15 @@ public class UserRepository {
     @PersistenceUnit(unitName = "imageHoster")
     private EntityManagerFactory emf;
 
-    //The method receives the User object to be persisted in the database
-    //Creates an instance of EntityManager
-    //Starts a transaction
-    //The transaction is committed if it is successful
-    //The transaction is rolled back in case of unsuccessful transaction
+    /**
+     * The method receives the User object to be persisted in the database
+     * Creates an instance of EntityManager
+     * Starts a transaction
+     * The transaction is committed if it is successful
+     * The transaction is rolled back in case of unsuccessful transaction
+     *
+     * @param newUser - The user to be persisted in the database
+     */
     public void registerUser(User newUser) {
         EntityManager em = emf.createEntityManager();
         EntityTransaction transaction = em.getTransaction();
@@ -32,11 +36,17 @@ public class UserRepository {
     }
 
 
-    //The method receives the entered username and password
-    //Creates an instance of EntityManager
-    //Executes JPQL query to fetch the user from User class where username is equal to received username and password is equal to received password
-    //Returns the fetched user
-    //Returns null in case of NoResultException
+    /**
+     * The method receives the entered username and password
+     * Creates an instance of EntityManager
+     * Executes JPQL query to fetch the user from User class where username is equal to received username and password is equal to received password
+     * Returns the fetched user
+     * Returns null in case of NoResultException
+     *
+     * @param username - username entered by the user
+     * @param password - password entered by the user
+     * @return - This method returns the User with corresponding username and passsword from the database and null in case of NoResultException
+     */
     public User checkUser(String username, String password) {
         try {
             EntityManager em = emf.createEntityManager();
@@ -49,4 +59,6 @@ public class UserRepository {
             return null;
         }
     }
+
+
 }

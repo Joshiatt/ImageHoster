@@ -18,16 +18,42 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.*;
 
+/**
+ * This is a controller class containing all the request handling methods to handle image operations in the ImageHoster application
+ * DispatcherServlet scans the classes annotated with @Controller annotation and looks for the appropriate handler method to serve the client request
+ */
 @Controller
 public class ImageController {
 
+    /**
+     * This class needs an object of ImageService class
+     * One way is to simply declare the object of ImageService class in this class using new operator
+     * But declaring the object using the new operator makes this class tightly coupled to ImageService class
+     * Therefore in order to achieve loose coupling, we use the concept of dependency injection
+     *
+     * @Autowired annotation injects the ImageService bean in this class from the Spring container, which has been declared in the Spring container at the time you run the application
+     */
     @Autowired
     private ImageService imageService;
 
+    /**
+     * This class needs an object of TagService class
+     * One way is to simply declare the object of TagService class in this class using new operator
+     * But declaring the object using the new operator makes this class tightly coupled to TagService class
+     * Therefore in order to achieve loose coupling, we use the concept of dependency injection
+     *
+     * @Autowired annotation injects the TagService bean in this class from the Spring container, which has been declared in the Spring container at the time you run the application
+     */
     @Autowired
     private TagService tagService;
 
-    //This method displays all the images in the user home page after successful login
+    /**
+     * This request handling method displays all the images in the user home page after successful login
+     * The method adds a list of images in the Model type object with 'images' as the key and returns the 'images.html' file displaying all the images in the application in the user homepage after successful login
+     *
+     * @param model - model is an object of Type Model, a class provided by the Spring. You can add the attributes in this Model type object and then access these attributes in the HTML files
+     * @return - The method returns the 'images.html' file displaying all the images in the application in the user homepage after successful login
+     */
     @RequestMapping("images")
     public String getUserImages(Model model) {
         List<Image> images = imageService.getAllImages();
@@ -35,41 +61,60 @@ public class ImageController {
         return "images";
     }
 
-    //This method is called when the details of the specific image with corresponding title are to be displayed
-    //The logic is to get the image from the databse with corresponding title. After getting the image from the database the details are shown
-    //First receive the dynamic parameter in the incoming request URL in a string variable 'title' and also the Model type object
-    //Call the getImageByTitle() method in the business logic to fetch all the details of that image
-    //Add the image in the Model type object with 'image' as the key
-    //Return 'images/image.html' file
 
-    //Also now you need to add the tags of an image in the Model type object
-    //Here a list of tags is added in the Model type object
-    //this list is then sent to 'images/image.html' file and the tags are displayed
-    @RequestMapping("/images/{title}")
-    public String showImage(@PathVariable("title") String title, Model model) {
-        Image image = imageService.getImageByTitle(title);
+    /**
+     * This request handling method is called when the details of the specific image with corresponding id are to be displayed
+     * The logic is to get the image from the database with corresponding image id. After getting the image from the database the details are shown
+     * First receive the dynamic parameter 'imageId' in the incoming request URL in a string variable 'imageId' and also the Model type object
+     * Call the getImage() method in the business logic to fetch all the details of that image
+     * Add the image in the Model type object with 'image' as the key
+     * Add the image tags in the Model type object with 'tags' as the key
+     * Add the image comments in the Model type object with 'comments' as the key
+     * Return 'images/image.html' file
+     *
+     * @param title   - This dynamic parameter contains the title of the image.
+     * @param imageId - This dynamic parameter contains the id of the image for which the details are to be displayed
+     * @param model   - model is an object of Type Model, a class provided by the Spring. You can add the attributes in this Model type object and then access these attributes in the HTML files
+     * @return - This method returns the 'images/image.html' file showing the details of the particular image
+     */
+    @RequestMapping("/images/{imageId}/{title}")
+    public String showImage(@PathVariable("title") String title, @PathVariable("imageId") Integer imageId, Model model) {
+        Image image = imageService.getImage(imageId);
         model.addAttribute("image", image);
         model.addAttribute("tags", image.getTags());
         return "images/image";
     }
 
-    //This controller method is called when the request pattern is of type 'images/upload'
-    //The method returns 'images/upload.html' file
+
+    /**
+     * This controller method is called when the request pattern is of type 'images/upload'
+     * The method returns 'images/upload.html' file
+     *
+     * @return - The method returns 'images/upload.html' file where you can upload the details of the image
+     */
     @RequestMapping("/images/upload")
     public String newImage() {
         return "images/upload";
     }
 
-    //This controller method is called when the request pattern is of type 'images/upload' and also the incoming request is of POST type
-    //The method receives all the details of the image to be stored in the database, and now the image will be sent to the business logic to be persisted in the database
-    //After you get the imageFile, set the user of the image by getting the logged in user from the Http Session
-    //Convert the image to Base64 format and store it as a string in the 'imageFile' attribute
-    //Set the date on which the image is posted
-    //After storing the image, this method directs to the logged in user homepage displaying all the images
 
-    //Get the 'tags' request parameter using @RequestParam annotation which is just a string of all the tags
-    //Store all the tags in the database and make a list of all the tags using the findOrCreateTags() method
-    //set the tags attribute of the image as a list of all the tags returned by the findOrCreateTags() method
+    /**
+     * This request handling method is called when the request pattern is of type 'images/upload' and also the incoming request is of POST type
+     * The method receives all the details of the image to be stored in the database, and now the image will be sent to the business logic to be persisted in the database
+     * After you get the imageFile, set the user of the image by getting the logged in user from the Http Session
+     * Convert the image to Base64 format and store it as a string in the 'imageFile' attribute
+     * Convert the string of all the tags separated by a comma to a list of tags using the findOrCreateTags() method and set the tags attribute of an image as a list of these tags
+     * findOrCreateTags() method also persists the non existing tags in the database
+     * Set the date on which the image is posted
+     * After storing the image, this method directs to the logged in user homepage displaying all the images
+     *
+     * @param file     - This request parameter contains the image file
+     * @param tags     - This request parameter contains the string of all the tags separated by a comma
+     * @param newImage - This is an object of type Image containing the image details
+     * @param session  - Http session containing the details of the logged in user
+     * @return - This method redirects to the request handling method with request mapping of type '/images' displaying all the images in the database
+     * @throws IOException
+     */
     @RequestMapping(value = "/images/upload", method = RequestMethod.POST)
     public String createImage(@RequestParam("file") MultipartFile file, @RequestParam("tags") String tags, Image newImage, HttpSession session) throws IOException {
 
@@ -77,7 +122,6 @@ public class ImageController {
         newImage.setUser(user);
         String uploadedImageData = convertUploadedFileToBase64(file);
         newImage.setImageFile(uploadedImageData);
-
         List<Tag> imageTags = findOrCreateTags(tags);
         newImage.setTags(imageTags);
         newImage.setDate(new Date());

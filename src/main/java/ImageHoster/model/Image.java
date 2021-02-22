@@ -45,9 +45,10 @@ public class Image {
     @JoinColumn(name = "user_id")
     private User user;
 
-    //The attribute contains a list of all the tags of an image
-    //Note that no column will be generated for this attribute in the database instead a new table will be created
-    //Since the mapping is Many to Many, a new table will be generated containing the two columns both referencing to the primary key of both the tables ('images', 'tags')
+    //The 'images' table is mapped to 'tags' table with Many:Many mapping
+    //One image can have multiple tags and there can be multiple images under one tag
+    //FetchType is LAZY
+    //A separate joint table will be created in the database containing two columns, both the columns referencing the primary keys of 'images' and 'tags' table respec.
     @ManyToMany(fetch = FetchType.LAZY)
     private List<Tag> tags = new ArrayList<>();
 

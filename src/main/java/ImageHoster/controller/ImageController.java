@@ -82,6 +82,7 @@ public class ImageController {
         Image image = imageService.getImage(imageId);
         model.addAttribute("image", image);
         model.addAttribute("tags", image.getTags());
+        model.addAttribute("comments", image.getComments());
         return "images/image";
     }
 
@@ -129,6 +130,42 @@ public class ImageController {
         return "redirect:/images";
     }
 
+
+    /**
+     * This controller method is called when the request pattern is of type 'editImage'
+     * This method fetches the image with the corresponding id from the database and adds it to the model with the key as 'image'
+     * Note that the tags of an image are in a list. You first need to convert the list of tags to a string of all tags separated by a comma and add the string in the Model type object with 'tags' as the key
+     * You also need to check whether the user who is editing the image is the owner of the image or not?
+     * How to do that?
+     * Get the current logged in user from the session and compare that user with the owner of the image
+     * If the current logged in user matches with the owner of the image, user can edit the image and the method returns 'images/edit.html' file wherein you fill all the updated details of the image
+     * Else you need to print the error message
+     * And add the editError, image, tags and comments in the Model type object and return the 'images/image.html' file again showing the details of the image
+     *
+     * @param imageId - This request parameter contains the id of the image to be edited
+     * @param model   - model is an object of Type Model, a class provided by the Spring. You can add the attributes in this Model type object and then access these attributes in the HTML files
+     * @param session - Http session containing the details of the logged in user
+     * @return - This method returns 'images/edit.html' file if the current user is the owner of the image. Else, the method redirects to 'images/image.html' file
+     */
+    @RequestMapping(value = "/editImage")
+    public String editImage(@RequestParam("imageId") Integer imageId, Model model, HttpSession session) {
+
+        User user = (User) (session.getAttribute("loggeduser"));
+        Image image = imageService.getImage(imageId);
+        if ((user.getId()).equals(image.getUser().getId())) {
+            String tags = convertTagsToString(image.getTags());
+            model.addAttribute("image", image);
+            model.addAttribute("tags", tags);
+            return "images/edit";
+        } else {
+            String error = "Only the owner of the image can edit the image";
+            model.addAttribute("editError", error);
+            model.addAttribute("image", image);
+            model.addAttribute("tags", image.getTags());
+            model.addAttribute("comments", image.getComments());
+            return "images/image";
+        }
+    }
 
 
     /**
@@ -203,6 +240,7 @@ public class ImageController {
             model.addAttribute("deleteError", error);
             model.addAttribute("image", image);
             model.addAttribute("tags", image.getTags());
+            model.addAttribute("comments", image.getComments());
             return "images/image";
         }
 

@@ -229,7 +229,7 @@ public class ImageController {
      * @return - This method redirects to the handling method with request mapping of type '/images' if the current user is the owner of the image. Else, the method redirects to 'images/image.html' file
      */
     @RequestMapping(value = "/deleteImage", method = RequestMethod.DELETE)
-    public String deleteImageSubmit(@RequestParam(name = "imageId") Integer imageId, Model model, HttpSession session) {
+    public String deleteImageSubmit(@RequestParam(name = "imageId") Integer imageId, Model model, HttpSession session) throws IOException{
         User user = (User) (session.getAttribute("loggeduser"));
         Image image = imageService.getImage(imageId);
         if ((user.getId()).equals(image.getUser().getId())) {

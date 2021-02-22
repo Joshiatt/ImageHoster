@@ -8,6 +8,14 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserService {
 
+    /**
+     * This class needs an object of UserRepository class
+     * One way is to simply declare the object of UserRepository class in this class using new operator
+     * But declaring the object using the new operator makes this class tightly coupled to UserRepository class
+     * Therefore in order to achieve loose coupling, we use the concept of dependency injection
+     *
+     * @Autowired annotation injects the UserRepository bean in this class from the Spring container, which has been declared in the Spring container at the time you run the application
+     */
     @Autowired
     private UserRepository userRepository;
 
@@ -16,13 +24,15 @@ public class UserService {
         userRepository.registerUser(newUser);
     }
 
-    //Since we did not have any user in the database, therefore the user with username 'upgrad' and password 'password' was hard-coded
-    //This method returned true if the username was 'upgrad' and password is 'password'
-    //But now let us change the implementation of this method
-    //This method receives the User type object
-    //Calls the checkUser() method in the Repository passing the username and password which checks the username and password in the database
-    //The Repository returns User type object if user with entered username and password exists in the database
-    //Else returns null
+    /**
+     * This method receives the User type object
+     * Calls the checkUser() method in the Repository passing the username and password which checks the username and password in the database
+     * The Repository returns User type object if user with entered username and password exists in the database
+     * Else returns null
+     *
+     * @param user - User type object
+     * @return - This method returns the User type object if user with entered username and password exists in the database, else returns null
+     */
     public User login(User user) {
         User existingUser = userRepository.checkUser(user.getUsername(), user.getPassword());
         if (existingUser != null) {
@@ -31,5 +41,4 @@ public class UserService {
             return null;
         }
     }
-
 }

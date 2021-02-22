@@ -7,6 +7,7 @@
 
 <h1>Edit Image</h1>
 
+<!-- A form to display the attributes to be edited for the image-->
 <form th:method="put" th:action="@{/editImage(imageId=${image.id})}" enctype="multipart/form-data">
 
     <div>Image Title :</div>
@@ -25,8 +26,6 @@
         <label for="file">Edit File</label>
         <input type="file" name="file" id="file"/>
     </div>
-
-    <!-- The code provides an option to edit the tags of an image and also displays the previous assigned tags to an image-->
     <br>
     <div>
         <label for="tags">Edit Tags</label>

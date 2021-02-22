@@ -10,7 +10,7 @@
 
 <body>
 <h1>Upload New Image</h1>
-
+<!-- A form to upload the image-->
 <form method="post" th:action="@{/images/upload}" enctype="multipart/form-data">
     <div>Image Title:</div>
     <div><input type="text" id="title" name="title"/></div>
@@ -19,13 +19,13 @@
     <div>Description:</div>
 
     <div><textarea rows="7" cols="100" name="description"></textarea></div>
+
     <br>
     <div>
         <label for="file">Upload File</label>
         <input type="file" name="file" id="file"/>
     </div>
 
-    <!-- This piece of code accepts the string of all the tags separated by a comma-->
     <br>
     <div>
         <label for="tags">Tags</label>
